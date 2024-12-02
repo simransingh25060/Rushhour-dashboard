@@ -95,8 +95,8 @@ const TimerControl = () => {
         <p className="text-xl font-serif">Race the clock!</p>
       </div>
 
-      <div className="flex space-x-8 w-full justify-center">
-        <div className="w-1/4 h-40 bg-gradient-to-r from-gray-500 to-gray-700 text-white p-4 rounded-lg border-8 border-yellow-400 shadow-lg flex flex-col justify-between">
+      <div className="flex sm:flex-row gap-6 sm:gap-0 flex-col sm:space-x-8 w-full justify-center w-full p-10 sm:p-0">
+        <div className="sm:w-1/4 h-40 bg-gradient-to-r from-gray-500 to-gray-700 text-white p-4 rounded-lg border-8 border-yellow-400 shadow-lg flex flex-col justify-between">
           <h3 className="text-lg flex-grow flex items-center justify-center">No. of teams that will be removed after each round:</h3>
           {removedTeams.length > 0 ? (
             <p className="text-2xl text-yellow-400 font-bold flex-grow flex items-center justify-center">
@@ -107,7 +107,7 @@ const TimerControl = () => {
           )}
         </div>
 
-        <div className="w-1/4 h-40 bg-gradient-to-r from-gray-500 to-gray-700 text-white p-4 rounded-lg border-8 border-yellow-400 shadow-lg flex flex-col justify-between">
+        <div className="sm:w-1/4 h-40 bg-gradient-to-r from-gray-500 to-gray-700 text-white p-4 rounded-lg border-8 border-yellow-400 shadow-lg flex flex-col justify-between">
           <h3 className="text-lg flex-grow flex items-center justify-center">Amount of time after which teams are eliminated:</h3>
           {timerDuration ? (
             <p className="text-xl text-yellow-400 font-bold flex-grow flex items-center justify-center">{timerDuration} minutes</p>
@@ -116,7 +116,7 @@ const TimerControl = () => {
           )}
         </div>
 
-        <div className="w-1/4 h-40 bg-gradient-to-r from-gray-500 to-gray-700 text-white p-4 rounded-lg border-8 border-yellow-400 shadow-lg flex flex-col justify-between">
+        <div className="sm:w-1/4 h-40 bg-gradient-to-r from-gray-500 to-gray-700 text-white p-4 rounded-lg border-8 border-yellow-400 shadow-lg flex flex-col justify-between">
           <h3 className="text-lg flex-grow flex items-center justify-center">Total no. of teams removed:</h3>
           <p className="text-2xl text-yellow-400 font-bold flex-grow flex items-center justify-center">{totalTeamsRemoved}</p>
         </div>
@@ -127,7 +127,7 @@ const TimerControl = () => {
         <span className="text-yellow-400">RULES!</span>
       </div>
 
-      <div className="flex space-x-6 w-full justify-center">
+      <div className="flex sm:flex-row flex-col gap-6 sm:gap-0 space-x-6 w-full justify-center">
         <div className="flex-1 flex justify-center items-center">
           <div className="w-1/2">
             <input
