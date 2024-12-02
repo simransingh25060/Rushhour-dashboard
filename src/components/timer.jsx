@@ -5,10 +5,75 @@ const TimerControl = () => {
   const [timerDuration, setTimerDuration] = useState('');
   const [time, setTime] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
-
   const [removedTeams, setRemovedTeams] = useState([]);
   const [totalTeamsRemoved, setTotalTeamsRemoved] = useState(0);
+  const [eliminatedTeams, setEliminatedTeams] = useState([]);
 
+
+  const handleTime = async () => {
+    try {
+      const parsedDuration = parseInt(timerDuration);
+      if (isNaN(parsedDuration) || parsedDuration <= 0) {
+        return;
+      }
+  
+      const response = await fetch('https://leaderboard-backend-rvnf.onrender.com/api/v1/setTime', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ time: parsedDuration }),
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok && data.time !== undefined) {
+        console.log('Time updated to:', data.time);
+        setTimerDuration(data.time); 
+        setTime(data.time * 60); 
+      } else {
+        console.error('Error updating time:', data.message || 'Invalid response');
+        // alert('Failed to update the timer. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error making request:', error);
+      // alert('An error occurred while updating the timer.');
+    }
+  };
+
+  const fetchEliminatedTeams = async () => {
+    try {
+      const response = await fetch('https://leaderboard-backend-rvnf.onrender.com/api/v1/removedTeams', {
+        method: 'GET',
+      });
+      const json = await response.json();
+      console.log('Deleted API response:', json);
+  
+      if (response.ok && json.success && Array.isArray(json.removedTeams)) {
+        setEliminatedTeams(json.removedTeams);
+        // const totalRemoved = json.removedTeams.reduce((sum, team) => sum + (team.removedCount || 0), 0);
+        // setTotalTeamsRemoved(totalRemoved);
+        // console.log(totalRemoved)
+      } else {
+        console.error('Invalid response format:', json);
+      }
+    } catch (error) {
+      console.error('Error fetching eliminated teams:', error);
+    }
+  };
+  
+
+  useEffect(() => {
+    fetchEliminatedTeams();
+    const intervalId = setInterval(() => {
+      fetchEliminatedTeams();
+    }, 5000);
+
+    return () => clearInterval(intervalId); // Clear the interval on component unmount
+  }, []);
+  
+  
+  
   const handleRemoveTeams = () => {
     const teamsToRemove = parseInt(removeTeamsCount);
     if (!isNaN(teamsToRemove) && teamsToRemove > 0) {
@@ -18,14 +83,45 @@ const TimerControl = () => {
       setTotalTeamsRemoved((prev) => prev + teamsToRemove);
       setRemoveTeamsCount('');
     } else {
-      alert('Please enter a valid number of teams to remove.');
+      // alert('Please enter a valid number of teams to remove.');
+    }
+  };
+
+  const handlenoofremoveteam = async () => {
+    try {
+      const teamsToRemove = parseInt(removeTeamsCount);
+      if (isNaN(teamsToRemove) || teamsToRemove <= 0){
+        // alert('Please enter a valid time to remove.');
+        return;
+      }
+
+      const response = await fetch('https://leaderboard-backend-rvnf.onrender.com/api/v1/setTeams', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ team: teamsToRemove }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.team !== undefined) {
+        console.log('new updated team removal:', data.team);
+        setRemoveTeamsCount(data.team);
+      } else {
+        console.error('Error removing time:', data.message || 'Invalid response');
+        // alert('Failed to remove. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error making request:', error);
+      // alert('An error occurred while removing the team.');
     }
   };
 
   const startTimer = () => {
     const parsedTime = parseInt(timerDuration);
     if (isNaN(parsedTime) || parsedTime <= 0) {
-      alert('Please enter a valid timer duration.');
+      // alert('Please enter a valid timer duration.');
       return;
     }
 
@@ -103,7 +199,7 @@ const TimerControl = () => {
               {removedTeams[removedTeams.length - 1].teamsRemoved} teams
             </p>
           ) : (
-            <p className="flex-grow flex items-center justify-center">No teams removed</p>
+            <p className="text-xl text-yellow-400 font-bold flex-grow flex items-center justify-center">{removeTeamsCount}</p>
           )}
         </div>
 
@@ -118,7 +214,7 @@ const TimerControl = () => {
 
         <div className="sm:w-1/4 h-40 bg-gradient-to-r from-gray-500 to-gray-700 text-white p-4 rounded-lg border-8 border-yellow-400 shadow-lg flex flex-col justify-between">
           <h3 className="text-lg flex-grow flex items-center justify-center">Total no. of teams removed:</h3>
-          <p className="text-2xl text-yellow-400 font-bold flex-grow flex items-center justify-center">{totalTeamsRemoved}</p>
+          <p className="text-2xl text-yellow-400 font-bold flex-grow flex items-center justify-center">{eliminatedTeams.length}</p>
         </div>
       </div>
 
@@ -139,7 +235,7 @@ const TimerControl = () => {
               min="1"
             />
             <button
-              onClick={handleRemoveTeams}
+              onClick={handlenoofremoveteam}
               className="bg-yellow-400 text-black font-bold p-2 rounded-lg w-1/2 mt-4 mx-auto flex-1 flex justify-center items-center"
             >
               SUBMIT
@@ -158,7 +254,7 @@ const TimerControl = () => {
               min="1"
             />
             <button
-              onClick={startTimer}
+              onClick={handleTime}
               className="bg-yellow-400 text-black font-bold p-2 rounded-lg w-1/2 mt-4 mx-auto flex-1 flex justify-center items-center"
             >
               SUBMIT
