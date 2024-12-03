@@ -26,6 +26,7 @@ const TimerControl = () => {
       });
   
       const data = await response.json();
+      console.log("TIme is ",response)
   
       if (response.ok && data.time !== undefined) {
         console.log('Time updated to:', data.time);
@@ -41,6 +42,47 @@ const TimerControl = () => {
     }
   };
 
+  const getTime = async () => {
+    try {
+      const response = await fetch('https://leaderboard-backend-rvnf.onrender.com/api/v1/getTime', {
+        method: 'GET',
+      });
+  
+      const data = await response.json();
+      console.log("Response is:", data);
+  
+      if (response.ok && data.data.time !== undefined) {
+        setTimerDuration(data.data.time)
+        console.log('Fetched timer duration:', data.data.time);
+      } else {
+        console.error('Error fetching time:', data.message || 'Invalid response');
+      }
+    } catch (error) {
+      console.error('Error fetching time:', error);
+    }
+  };
+
+  const getTeam = async () => {
+    try {
+      const response = await fetch('https://leaderboard-backend-rvnf.onrender.com/api/v1/getTeams', {
+        method: 'GET',
+      });
+  
+      const data = await response.json();
+      console.log("Response of team is:", data);
+  
+      if (response.ok && data.data.team !== undefined) {
+        setRemoveTeamsCount(data.data.team)
+        console.log('Fetched team:', data.data.team);
+      } else {
+        console.error('Error fetching team:', data.message || 'Invalid response');
+      }
+    } catch (error) {
+      console.error('Error fetching team:', error);
+    }
+  };
+
+  
   const fetchEliminatedTeams = async () => {
     try {
       const response = await fetch('https://leaderboard-backend-rvnf.onrender.com/api/v1/removedTeams', {
@@ -64,10 +106,14 @@ const TimerControl = () => {
   
 
   useEffect(() => {
+    getTime();
+    getTeam();
     fetchEliminatedTeams();
     const intervalId = setInterval(() => {
+      getTime();
+      getTeam();
       fetchEliminatedTeams();
-    }, 5000);
+    }, 3000);
 
     return () => clearInterval(intervalId); // Clear the interval on component unmount
   }, []);
@@ -155,6 +201,9 @@ const TimerControl = () => {
   const formatMinutes = (seconds) => Math.floor(seconds / 60);
   const formatSeconds = (seconds) => seconds % 60;
 
+  console.log("rempved team cound");
+  console.log(removeTeamsCount);
+
   return (
     <div
       className="flex flex-col items-center justify-center space-y-6 h-screen overflow-hidden"
@@ -196,7 +245,7 @@ const TimerControl = () => {
           <h3 className="text-lg flex-grow flex items-center justify-center">No. of teams that will be removed after each round:</h3>
           {removedTeams.length > 0 ? (
             <p className="text-2xl text-yellow-400 font-bold flex-grow flex items-center justify-center">
-              {removedTeams[removedTeams.length - 1].teamsRemoved} teams
+              {removeTeamsCount ? `${removeTeamsCount} teams` : 'Loading...'} teams
             </p>
           ) : (
             <p className="text-xl text-yellow-400 font-bold flex-grow flex items-center justify-center">{removeTeamsCount}</p>
