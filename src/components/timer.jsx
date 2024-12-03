@@ -12,7 +12,59 @@ const TimerControl = () => {
   const [toggleDuration, setToggleDuration] = useState(true)
   const [toggleTeam, setToggleTeam] = useState(true)
   const [teamDeletion, setTeamDeletion] = useState('')
+  const [elimination, setelimination] = useState(false);
+  const [remainingTeams, setRemainingTeams] = useState(null);
+  const [startButtonVisible, setStartButtonVisible] = useState(true);
 
+
+  
+  const delTime = async () => {
+    try {
+      const response = await fetch('https://leaderboard-backend-rvnf.onrender.com/api/v1/delTeams', {
+        method: 'POST',
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Team elimination process triggered:', data);
+        
+        if (data.remainingTeams !== undefined) {
+          setRemainingTeams(data.remainingTeams);
+        }
+        if (data.remainingTeams === 0) {
+          setelimination(false);
+          console.log('All teams have been eliminated.');
+        }
+      } else {
+        console.error('Failed to trigger team elimination:', response.statusText);
+        setelimination(false); 
+      }
+    } catch (error) {
+      console.error('Error triggering team elimination:', error);
+      setelimination(false); 
+    }
+  };
+
+  const startEliminationProcess = async () => {
+    if (elimination) {
+      console.log('Elimination process is already running.');
+      return;
+    }
+    setelimination(true);
+    try {
+      await delTime();
+      setStartButtonVisible(false);
+    } catch (error) {
+      console.error('Failed to start elimination process:', error);
+      setelimination(false);
+    }
+  };
+
+  useEffect(() => {
+    if (remainingTeams === 0) {
+      setelimination(false);
+    }
+  }, [remainingTeams]);
 
   const handleTime = async () => {
     try {
@@ -331,6 +383,16 @@ const TimerControl = () => {
           </div>
         </div>
 
+        {startButtonVisible && (
+  <button 
+    onClick={startEliminationProcess}
+    className="bg-yellow-400 text-black font-bold p-2 rounded-lg w-[15vw] mt-4 mx-auto  flex justify-center items-center"
+    disabled={elimination}
+  >
+    START
+  </button>
+)}
+       
         <div className="flex-1 flex justify-center items-center">
           <div className="w-1/2">
             <input
@@ -349,6 +411,8 @@ const TimerControl = () => {
             </button>
           </div>
         </div>
+        
+        
       </div>
 
       {isRunning && time > 0 && (
