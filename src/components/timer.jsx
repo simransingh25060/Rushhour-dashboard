@@ -8,10 +8,68 @@ const TimerControl = () => {
   const [removedTeams, setRemovedTeams] = useState([]);
   const [totalTeamsRemoved, setTotalTeamsRemoved] = useState(0);
   const [eliminatedTeams, setEliminatedTeams] = useState([]);
+  const [timerDurationData, setTimerDurationData] = useState('');
+  const [toggleDuration, setToggleDuration] = useState(true)
+  const [toggleTeam, setToggleTeam] = useState(true)
+  const [teamDeletion, setTeamDeletion] = useState('')
+  const [elimination, setelimination] = useState(false);
+  const [remainingTeams, setRemainingTeams] = useState(null);
+  const [startButtonVisible, setStartButtonVisible] = useState(true);
 
+
+  
+  const delTime = async () => {
+    try {
+      const response = await fetch('https://leaderboard-backend-rvnf.onrender.com/api/v1/delTeams', {
+        method: 'POST',
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Team elimination process triggered:', data);
+        
+        if (data.remainingTeams !== undefined) {
+          setRemainingTeams(data.remainingTeams);
+        }
+        if (data.remainingTeams === 0) {
+          setelimination(false);
+          console.log('All teams have been eliminated.');
+        }
+      } else {
+        console.error('Failed to trigger team elimination:', response.statusText);
+        setelimination(false); 
+      }
+    } catch (error) {
+      console.error('Error triggering team elimination:', error);
+      setelimination(false); 
+    }
+  };
+
+  const startEliminationProcess = async () => {
+    if (elimination) {
+      console.log('Elimination process is already running.');
+      return;
+    }
+    setelimination(true);
+    try {
+      await delTime();
+      setStartButtonVisible(false);
+    } catch (error) {
+      console.error('Failed to start elimination process:', error);
+      setelimination(false);
+    }
+  };
+
+  useEffect(() => {
+    if (remainingTeams === 0) {
+      setelimination(false);
+    }
+  }, [remainingTeams]);
 
   const handleTime = async () => {
     try {
+      console.log(toggleDuration,"ujhygfygfy")
+      setToggleDuration(true)
       const parsedDuration = parseInt(timerDuration);
       if (isNaN(parsedDuration) || parsedDuration <= 0) {
         return;
@@ -26,12 +84,16 @@ const TimerControl = () => {
       });
   
       const data = await response.json();
-      console.log("TIme is ",response)
+      console.log("TIme is ",data)
   
-      if (response.ok && data.time !== undefined) {
+      if (response.ok && data.time !== undefined && toggleDuration) {
+
         console.log('Time updated to:', data.time);
         setTimerDuration(data.time); 
+        setTimerDurationData(data.time)
         setTime(data.time * 60); 
+        setToggleDuration(false)
+        
       } else {
         console.error('Error updating time:', data.message || 'Invalid response');
         // alert('Failed to update the timer. Please try again.');
@@ -42,6 +104,7 @@ const TimerControl = () => {
     }
   };
 
+ useEffect(()=>{
   const getTime = async () => {
     try {
       const response = await fetch('https://leaderboard-backend-rvnf.onrender.com/api/v1/getTime', {
@@ -52,7 +115,8 @@ const TimerControl = () => {
       console.log("Response is:", data);
   
       if (response.ok && data.data.time !== undefined) {
-        setTimerDuration(data.data.time)
+        setTimerDurationData(data.data.time)
+        setToggleDuration(false)
         console.log('Fetched timer duration:', data.data.time);
       } else {
         console.error('Error fetching time:', data.message || 'Invalid response');
@@ -61,7 +125,11 @@ const TimerControl = () => {
       console.error('Error fetching time:', error);
     }
   };
+  getTime();
+ },[toggleDuration])
 
+
+ useEffect(() =>{
   const getTeam = async () => {
     try {
       const response = await fetch('https://leaderboard-backend-rvnf.onrender.com/api/v1/getTeams', {
@@ -72,7 +140,9 @@ const TimerControl = () => {
       console.log("Response of team is:", data);
   
       if (response.ok && data.data.team !== undefined) {
-        setRemoveTeamsCount(data.data.team)
+        // setRemoveTeamsCount(data.data.team)
+        setTeamDeletion(data.data.team)
+        setToggleTeam(false)
         console.log('Fetched team:', data.data.team);
       } else {
         console.error('Error fetching team:', data.message || 'Invalid response');
@@ -81,6 +151,9 @@ const TimerControl = () => {
       console.error('Error fetching team:', error);
     }
   };
+  getTeam();
+ },[toggleTeam])
+  
 
   
   const fetchEliminatedTeams = async () => {
@@ -103,15 +176,22 @@ const TimerControl = () => {
       console.error('Error fetching eliminated teams:', error);
     }
   };
+
+  useEffect(()=>{
+    if(toggleDuration){handleTime();
+    }  
+  },[toggleDuration])
+
+  
   
 
   useEffect(() => {
-    getTime();
-    getTeam();
+    // getTime();
+    // getTeam();
     fetchEliminatedTeams();
     const intervalId = setInterval(() => {
-      getTime();
-      getTeam();
+      // getTime();
+      // getTeam();
       fetchEliminatedTeams();
     }, 5000);
 
@@ -134,7 +214,9 @@ const TimerControl = () => {
   };
 
   const handlenoofremoveteam = async () => {
+    
     try {
+      setToggleTeam(true)
       const teamsToRemove = parseInt(removeTeamsCount);
       if (isNaN(teamsToRemove) || teamsToRemove <= 0){
         // alert('Please enter a valid time to remove.');
@@ -153,7 +235,9 @@ const TimerControl = () => {
 
       if (response.ok && data.team !== undefined) {
         console.log('new updated team removal:', data.team);
-        setRemoveTeamsCount(data.team);
+        // setRemoveTeamsCount(data.team);
+        setTeamDeletion(data.team)
+        setToggleTeam(false)
       } else {
         console.error('Error removing time:', data.message || 'Invalid response');
         // alert('Failed to remove. Please try again.');
@@ -163,6 +247,13 @@ const TimerControl = () => {
       // alert('An error occurred while removing the team.');
     }
   };
+
+  useEffect(()=>{
+    if(toggleTeam){
+      console.log("djbfb")
+      handlenoofremoveteam();
+    }  
+  },[toggleTeam])
 
   const startTimer = () => {
     const parsedTime = parseInt(timerDuration);
@@ -243,19 +334,19 @@ const TimerControl = () => {
       <div className="flex sm:flex-row gap-6 sm:gap-0 flex-col sm:space-x-8 w-full justify-center w-full p-10 sm:p-0">
         <div className="sm:w-1/4 h-40 bg-gradient-to-r from-gray-500 to-gray-700 text-white p-4 rounded-lg border-8 border-yellow-400 shadow-lg flex flex-col justify-between">
           <h3 className="text-lg flex-grow flex items-center justify-center">No. of teams that will be removed after each round:</h3>
-          {removedTeams.length > 0 ? (
+          {teamDeletion ? (
             <p className="text-2xl text-yellow-400 font-bold flex-grow flex items-center justify-center">
-              {removeTeamsCount ? `${removeTeamsCount} teams` : 'Loading...'} teams
+              {teamDeletion} teams
             </p>
           ) : (
-            <p className="text-xl text-yellow-400 font-bold flex-grow flex items-center justify-center">{removeTeamsCount}</p>
-          )}
+            <p className="text-xl text-yellow-400 font-bold flex-grow flex items-center justify-center">Loading...</p>
+          )}  
         </div>
 
         <div className="sm:w-1/4 h-40 bg-gradient-to-r from-gray-500 to-gray-700 text-white p-4 rounded-lg border-8 border-yellow-400 shadow-lg flex flex-col justify-between">
           <h3 className="text-lg flex-grow flex items-center justify-center">Amount of time after which teams are eliminated:</h3>
-          {timerDuration ? (
-            <p className="text-xl text-yellow-400 font-bold flex-grow flex items-center justify-center">{timerDuration} minutes</p>
+          {timerDurationData ? (
+            <p className="text-xl text-yellow-400 font-bold flex-grow flex items-center justify-center">{timerDurationData} minutes</p>
           ) : (
             <p className="text-2xl flex-grow flex items-center justify-center">No timer set</p>
           )}
@@ -292,6 +383,16 @@ const TimerControl = () => {
           </div>
         </div>
 
+        {startButtonVisible && (
+  <button 
+    onClick={startEliminationProcess}
+    className="bg-yellow-400 text-black font-bold p-2 rounded-lg w-[15vw] mt-4 mx-auto  flex justify-center items-center"
+    disabled={elimination}
+  >
+    START
+  </button>
+)}
+       
         <div className="flex-1 flex justify-center items-center">
           <div className="w-1/2">
             <input
@@ -310,6 +411,8 @@ const TimerControl = () => {
             </button>
           </div>
         </div>
+        
+        
       </div>
 
       {isRunning && time > 0 && (
