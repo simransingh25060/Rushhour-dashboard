@@ -297,7 +297,7 @@ const TimerControl = () => {
 
   return (
     <div
-      className="flex flex-col items-center justify-center space-y-6 h-screen overflow-hidden"
+      className="flex flex-col items-center justify-center space-y-6 h-screen overflow-hidden sm:overflow-visible"
       style={{
         backgroundImage:
           'url(https://ucarecdn.com/3b2b02c1-7369-4555-838a-3afe97ff7ec4/-/preview/1000x711/)',
