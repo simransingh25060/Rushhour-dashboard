@@ -16,7 +16,25 @@ const TimerControl = () => {
   const [remainingTeams, setRemainingTeams] = useState(null);
   const [startButtonVisible, setStartButtonVisible] = useState(true);
 
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768); 
 
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  const scrollStyle = {
+    overflow: isMobile ? 'auto' : 'hidden', 
+    height: '100vh',
+  };
   
   const delTime = async () => {
     try {
@@ -297,7 +315,7 @@ const TimerControl = () => {
 
   return (
     <div
-      className="flex flex-col items-center justify-center space-y-6 h-screen overflow-hidden sm:overflow-visible"
+      className="flex flex-col items-center justify-center space-y-6 h-screen"
       style={{
         backgroundImage:
           'url(https://ucarecdn.com/3b2b02c1-7369-4555-838a-3afe97ff7ec4/-/preview/1000x711/)',
