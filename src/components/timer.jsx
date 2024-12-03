@@ -113,7 +113,7 @@ const TimerControl = () => {
       getTime();
       getTeam();
       fetchEliminatedTeams();
-    }, 3000);
+    }, 5000);
 
     return () => clearInterval(intervalId); // Clear the interval on component unmount
   }, []);
