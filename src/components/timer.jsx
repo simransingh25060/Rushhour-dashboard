@@ -315,7 +315,7 @@ const TimerControl = () => {
 
   return (
     <div
-      className="flex flex-col items-center justify-center space-y-6 h-screen"
+      className="flex flex-col items-center justify-center space-y-6 sm:h-screen h-auto "
       style={{
         backgroundImage:
           'url(https://ucarecdn.com/3b2b02c1-7369-4555-838a-3afe97ff7ec4/-/preview/1000x711/)',
@@ -328,13 +328,13 @@ const TimerControl = () => {
       <img
         src="https://ucarecdn.com/671f6e4e-6688-44b0-bee5-8f5e786e1a65/"
         alt="Logo2"
-        className="absolute top-4 right-4 w-16 h-16"
+        className="absolute top-4 right-4 sm:w-16 w-10 h-16"
       />
 
       <img
         src="https://ucarecdn.com/1d59e6f5-5e72-47ba-9366-6db6db0ba486/-/preview/260x118/"
         alt="Logo1"
-        className="absolute top-6 left-1/2 transform -translate-x-1/2 w-12 h-8"
+        className="absolute top-6 left-1/2 transform -translate-x-1/2 sm:w-12 w-8 sm:h-8 h-6"
       />
 
       <div className="text-center text-white space-y-4">
@@ -343,7 +343,7 @@ const TimerControl = () => {
           <img
             src="https://ucarecdn.com/29d62219-3eee-4275-aca4-d50c562b276b/-/preview/1000x154/"
             alt="Rush Hour"
-            className="w-96 h-auto"
+            className="sm:w-96 w-[50vw] h-auto mt-4"
           />
         </div>
         <p className="text-xl font-serif">Race the clock!</p>
@@ -404,7 +404,7 @@ const TimerControl = () => {
         {startButtonVisible && (
   <button 
     onClick={startEliminationProcess}
-    className="bg-yellow-400 text-black font-bold p-2 rounded-lg w-[15vw] mt-4 mx-auto  flex justify-center items-center"
+    className="bg-yellow-400 text-black font-bold p-2 rounded-lg w-[15vw] mt-4 mx-auto  flex justify-center items-center self-center"
     disabled={elimination}
   >
     START
