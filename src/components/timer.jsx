@@ -171,6 +171,45 @@ const TimerControl = () => {
   };
   getTeam();
  },[toggleTeam])
+
+ const getTiming = async () => {
+  try {
+    const response = await fetch('https://leaderboard-backend-rvnf.onrender.com/api/v1/getTime', {
+      method: 'GET',
+    });
+
+    const data = await response.json();
+    setTimerDurationData(data.data.time)
+    console.log("Response is:", data);
+
+    if (response.ok && data.data.time !== undefined) {
+      console.log('Fetched timer duration:', data.data.time);
+    } else {
+      console.error('Error fetching time:', data.message || 'Invalid response');
+    }
+  } catch (error) {
+    console.error('Error fetching time:', error);
+  }
+};
+const getTeaming = async () => {
+  try {
+    const response = await fetch('https://leaderboard-backend-rvnf.onrender.com/api/v1/getTeams', {
+      method: 'GET',
+    });
+
+    const data = await response.json();
+    console.log("Response of team is:", data);
+
+    if (response.ok && data.data.team !== undefined) {
+      setTeamDeletion(data.data.team);
+      console.log('Fetched team:', data.data.team);
+    } else {
+      console.error('Error fetching team:', data.message || 'Invalid response');
+    }
+  } catch (error) {
+    console.error('Error fetching team:', error);
+  }
+};
   
 
   
@@ -206,12 +245,16 @@ const TimerControl = () => {
   useEffect(() => {
     // getTime();
     // getTeam();
+    getTeaming();
+    getTiming();
     fetchEliminatedTeams();
     const intervalId = setInterval(() => {
       // getTime();
       // getTeam();
+      getTeaming();
+      getTiming();
       fetchEliminatedTeams();
-    }, 5000);
+    }, 3000);
 
     return () => clearInterval(intervalId); // Clear the interval on component unmount
   }, []);
