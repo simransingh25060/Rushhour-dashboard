@@ -38,20 +38,20 @@ const TimerControl = () => {
   
   const delTime = async () => {
     try {
-      const response = await fetch('https://leaderboard-backend-rvnf.onrender.com/api/v1/delTeams', {
+      const response = await fetch(`${import.meta.env.VITE_REACT_BASE_URL}/api/v1/delTeams`, {
         method: 'POST',
       });
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Team elimination process triggered:', data);
+        // console.log('Team elimination process triggered:', data);
         
         if (data.remainingTeams !== undefined) {
           setRemainingTeams(data.remainingTeams);
         }
         if (data.remainingTeams === 0) {
           setelimination(false);
-          console.log('All teams have been eliminated.');
+          // console.log('All teams have been eliminated.');
         }
       } else {
         console.error('Failed to trigger team elimination:', response.statusText);
@@ -65,7 +65,7 @@ const TimerControl = () => {
 
   const startEliminationProcess = async () => {
     if (elimination) {
-      console.log('Elimination process is already running.');
+      // console.log('Elimination process is already running.');
       return;
     }
     setelimination(true);
@@ -86,14 +86,14 @@ const TimerControl = () => {
 
   const handleTime = async () => {
     try {
-      console.log(toggleDuration,"ujhygfygfy")
+      // console.log(toggleDuration,"ujhygfygfy")
       setToggleDuration(true)
       const parsedDuration = parseInt(timerDuration);
       if (isNaN(parsedDuration) || parsedDuration <= 0) {
         return;
       }
   
-      const response = await fetch('https://leaderboard-backend-rvnf.onrender.com/api/v1/setTime', {
+      const response = await fetch(`${import.meta.env.VITE_REACT_BASE_URL}/api/v1/setTime`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -102,11 +102,11 @@ const TimerControl = () => {
       });
   
       const data = await response.json();
-      console.log("TIme is ",data)
+      // console.log("TIme is ",data)
   
       if (response.ok && data.time !== undefined && toggleDuration) {
 
-        console.log('Time updated to:', data.time);
+        // console.log('Time updated to:', data.time);
         setTimerDuration(data.time); 
         setTimerDurationData(data.time)
         setTime(data.time * 60); 
@@ -125,17 +125,17 @@ const TimerControl = () => {
  useEffect(()=>{
   const getTime = async () => {
     try {
-      const response = await fetch('https://leaderboard-backend-rvnf.onrender.com/api/v1/getTime', {
+      const response = await fetch(`${import.meta.env.VITE_REACT_BASE_URL}/api/v1/getTime`, {
         method: 'GET',
       });
   
       const data = await response.json();
-      console.log("Response is:", data);
+      // console.log("Response is:", data);
   
       if (response.ok && data.data.time !== undefined) {
         setTimerDurationData(data.data.time)
         setToggleDuration(false)
-        console.log('Fetched timer duration:', data.data.time);
+        // console.log('Fetched timer duration:', data.data.time);
       } else {
         console.error('Error fetching time:', data.message || 'Invalid response');
       }
@@ -150,18 +150,18 @@ const TimerControl = () => {
  useEffect(() =>{
   const getTeam = async () => {
     try {
-      const response = await fetch('https://leaderboard-backend-rvnf.onrender.com/api/v1/getTeams', {
+      const response = await fetch(`${import.meta.env.VITE_REACT_BASE_URL}/api/v1/getTeams`, {
         method: 'GET',
       });
   
       const data = await response.json();
-      console.log("Response of team is:", data);
+      // console.log("Response of team is:", data);
   
       if (response.ok && data.data.team !== undefined) {
         // setRemoveTeamsCount(data.data.team)
         setTeamDeletion(data.data.team)
         setToggleTeam(false)
-        console.log('Fetched team:', data.data.team);
+        // console.log('Fetched team:', data.data.team);
       } else {
         console.error('Error fetching team:', data.message || 'Invalid response');
       }
@@ -174,13 +174,13 @@ const TimerControl = () => {
 
  const getTiming = async () => {
   try {
-    const response = await fetch('https://leaderboard-backend-rvnf.onrender.com/api/v1/getTime', {
+    const response = await fetch(`${import.meta.env.VITE_REACT_BASE_URL}/api/v1/getTime`, {
       method: 'GET',
     });
 
     const data = await response.json();
     setTimerDurationData(data.data.time)
-    console.log("Response is:", data);
+    // console.log("Response is:", data);
 
     if (response.ok && data.data.time !== undefined) {
       console.log('Fetched timer duration:', data.data.time);
@@ -193,16 +193,16 @@ const TimerControl = () => {
 };
 const getTeaming = async () => {
   try {
-    const response = await fetch('https://leaderboard-backend-rvnf.onrender.com/api/v1/getTeams', {
+    const response = await fetch(`${import.meta.env.VITE_REACT_BASE_URL}/api/v1/getTeams`, {
       method: 'GET',
     });
 
     const data = await response.json();
-    console.log("Response of team is:", data);
+    // console.log("Response of team is:", data);
 
     if (response.ok && data.data.team !== undefined) {
       setTeamDeletion(data.data.team);
-      console.log('Fetched team:', data.data.team);
+      // console.log('Fetched team:', data.data.team);
     } else {
       console.error('Error fetching team:', data.message || 'Invalid response');
     }
@@ -215,11 +215,11 @@ const getTeaming = async () => {
   
   const fetchEliminatedTeams = async () => {
     try {
-      const response = await fetch('https://leaderboard-backend-rvnf.onrender.com/api/v1/removedTeams', {
+      const response = await fetch(`${import.meta.env.VITE_REACT_BASE_URL}/api/v1/removedTeams`, {
         method: 'GET',
       });
       const json = await response.json();
-      console.log('Deleted API response:', json);
+      // console.log('Deleted API response:', json);
   
       if (response.ok && json.success && Array.isArray(json.removedTeams)) {
         setEliminatedTeams(json.removedTeams);
@@ -284,7 +284,7 @@ const getTeaming = async () => {
         return;
       }
 
-      const response = await fetch('https://leaderboard-backend-rvnf.onrender.com/api/v1/setTeams', {
+      const response = await fetch(`${import.meta.env.VITE_REACT_BASE_URL}/api/v1/setTeams`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -295,7 +295,7 @@ const getTeaming = async () => {
       const data = await response.json();
 
       if (response.ok && data.team !== undefined) {
-        console.log('new updated team removal:', data.team);
+        // console.log('new updated team removal:', data.team);
         // setRemoveTeamsCount(data.team);
         setTeamDeletion(data.team)
         setToggleTeam(false)
@@ -311,7 +311,7 @@ const getTeaming = async () => {
 
   useEffect(()=>{
     if(toggleTeam){
-      console.log("djbfb")
+      // console.log("djbfb")
       handlenoofremoveteam();
     }  
   },[toggleTeam])
@@ -324,7 +324,7 @@ const getTeaming = async () => {
     }
 
     try {
-      console.log(`Starting timer for ${parsedTime} minutes...`);
+      // console.log(`Starting timer for ${parsedTime} minutes...`);
       const response = { success: true, startTime: Date.now(), duration: parsedTime };
 
       if (response.success) {
@@ -353,8 +353,8 @@ const getTeaming = async () => {
   const formatMinutes = (seconds) => Math.floor(seconds / 60);
   const formatSeconds = (seconds) => seconds % 60;
 
-  console.log("rempved team cound");
-  console.log(removeTeamsCount);
+  // console.log("rempved team cound");
+  // console.log(removeTeamsCount);
 
   return (
     <div
